@@ -9,6 +9,10 @@ import (
 func main() {
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Hello world!")
+	})
+
 	port := ":8080"
 	fmt.Printf("Listening on %s \n", port)
 
