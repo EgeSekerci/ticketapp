@@ -3,11 +3,12 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+
+	"ticketapp/shared"
 )
 
 type dbConfig struct {
@@ -30,9 +31,7 @@ func loadDbConfig() dbConfig {
 
 func Connect() *sql.DB {
 	err := godotenv.Load()
-	if err != nil {
-		log.Println("Error loading .env")
-	}
+	shared.Check(err, "Error loading .env")
 
 	configs := loadDbConfig()
 
@@ -41,9 +40,8 @@ func Connect() *sql.DB {
 		configs.dbHost, configs.dbPort, configs.dbUser, configs.dbPassword, configs.dbName)
 
 	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		log.Println("Error connecting to the database")
-	}
+
+	shared.Check(err, "Error connecting to the database")
 
 	return db
 }

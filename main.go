@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"ticketapp/routes"
+	"ticketapp/shared"
 )
 
 func main() {
@@ -17,7 +17,5 @@ func main() {
 	fmt.Printf("Listening on %s \n", port)
 
 	err := http.ListenAndServe(port, mux)
-	if err != nil {
-		log.Println("Error starting the server")
-	}
+	shared.Check(err, "Error starting the server")
 }
