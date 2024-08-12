@@ -11,7 +11,7 @@ import (
 func main() {
 	mux := http.NewServeMux()
 
-	routes.HandleRoutes(mux)
+	routes.TicketRoutes(mux)
 
 	port := ":8080"
 	fmt.Printf("Listening on %s \n", port)
