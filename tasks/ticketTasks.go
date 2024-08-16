@@ -16,6 +16,32 @@ type Ticket struct {
 	CreatedAt time.Time
 }
 
+func GetTickets(w http.ResponseWriter, r *http.Request) {
+	db := db.Connect()
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM tickets")
+	shared.Check(err, "Error receiving tickets")
+
+	defer rows.Close()
+
+	var tickets []Ticket
+
+	for rows.Next() {
+		var ticket Ticket
+
+		err := rows.Scan(
+			&ticket.Title,
+			&ticket.Desc,
+			&ticket.CreatedAt,
+		)
+		shared.Check(err, "Error scanning ticket data")
+		tickets = append(tickets, ticket)
+	}
+	shared.Check(rows.Err(), "Error on rows.Next()")
+	fmt.Println(tickets)
+}
+
 func AddTicket(w http.ResponseWriter, r *http.Request) {
 	ticket := Ticket{}
 
