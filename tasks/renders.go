@@ -3,6 +3,7 @@ package tasks
 import (
 	"embed"
 	"html/template"
+	"net/http"
 	"path/filepath"
 
 	"ticketapp/shared"
@@ -30,3 +31,9 @@ func ParseAllFiles(content embed.FS) error {
 	return err
 }
 
+func RenderHome(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+
+	err := tmpl.ExecuteTemplate(w, "layout", nil)
+	shared.Check(err, "Error executing template")
+}

@@ -23,6 +23,7 @@ func init() {
 func main() {
 	mux := http.NewServeMux()
 
+	routes.PageRoutes(mux)
 	routes.TicketRoutes(mux)
 
 	port := ":8080"
