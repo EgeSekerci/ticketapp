@@ -3,11 +3,25 @@ package tasks
 import (
 	"embed"
 	"html/template"
+	"log"
 	"net/http"
 	"path/filepath"
 
 	"ticketapp/shared"
 )
+
+func ServeStaticFiles(w http.ResponseWriter, r *http.Request, content embed.FS) {
+	fs := http.FileServer(http.FS(content))
+	http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("Error serving static files: %v", r)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+			}
+		}()
+		fs.ServeHTTP(w, r)
+	}).ServeHTTP(w, r)
+}
 
 func getTemplateFiles(patterns ...string) []string {
 	var files []string

@@ -10,7 +10,7 @@ import (
 	"ticketapp/tasks"
 )
 
-//go:embed templates/**
+//go:embed templates/** static/*
 var content embed.FS
 
 func init() {
@@ -24,6 +24,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	routes.PageRoutes(mux)
+	routes.ServeRoutes(mux, content)
 	routes.TicketRoutes(mux)
 
 	port := ":8080"

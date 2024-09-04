@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"embed"
 	"net/http"
 
 	"ticketapp/tasks"
@@ -8,6 +9,15 @@ import (
 
 func PageRoutes(mux *http.ServeMux) {
 	mux.Handle("GET /", http.HandlerFunc(tasks.RenderHome))
+}
+
+func ServeRoutes(mux *http.ServeMux, content embed.FS) {
+	mux.Handle(
+		"GET /static/",
+		http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) { tasks.ServeStaticFiles(w, r, content) },
+		),
+	)
 }
 
 func TicketRoutes(mux *http.ServeMux) {
