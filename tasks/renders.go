@@ -41,6 +41,7 @@ func ParseAllFiles(content embed.FS) error {
 	tmpl, err = template.ParseFS(
 		content,
 		"templates/*.html",
+		"templates/*/*.html",
 	)
 	return err
 }
