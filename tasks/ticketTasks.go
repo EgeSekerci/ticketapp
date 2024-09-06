@@ -58,5 +58,6 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 	_, err := db.Exec(insert, ticket.Title, ticket.Desc, ticket.CreatedAt)
 	shared.Check(err, "Error inserting ticket")
 
+	err = tmpl.ExecuteTemplate(w, "layout", nil)
 	fmt.Println("Ticket added successfully\n", ticket)
 }
