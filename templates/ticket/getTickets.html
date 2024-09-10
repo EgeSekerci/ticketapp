@@ -1,0 +1,9 @@
+{{define "getTickets"}}
+{{range $index, $ticket := .Tickets}}
+<div>
+    <div>{{$ticket.Title}}</div>
+    <div>{{$ticket.Desc}}</div>
+    <div>{{$ticket.CreatedAt}}</div>
+</div>
+{{end}}
+{{end}}

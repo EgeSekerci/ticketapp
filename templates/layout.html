@@ -16,6 +16,9 @@
 <body>
     <main>
         {{template "addTicket" .}}
+        <div hx-get="/api/v1/tickets" hx-trigger="load" hx-target="this" hx-swap="innerHTML">
+            {{template "getTickets" .}}
+        </div>
     </main>
 </body>
 

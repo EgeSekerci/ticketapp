@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -14,6 +13,9 @@ type Ticket struct {
 	Title     string
 	Desc      string
 	CreatedAt time.Time
+}
+type TemplateData struct {
+	Tickets []Ticket
 }
 
 func GetTickets(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +41,12 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 		tickets = append(tickets, ticket)
 	}
 	shared.Check(rows.Err(), "Error on rows.Next()")
-	fmt.Println(tickets)
+
+	templateData := TemplateData{
+		Tickets: tickets,
+	}
+	err = tmpl.ExecuteTemplate(w, "getTickets", templateData)
+	shared.Check(err, "Error executing template")
 }
 
 func AddTicket(w http.ResponseWriter, r *http.Request) {
