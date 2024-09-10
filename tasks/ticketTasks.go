@@ -45,8 +45,19 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 func AddTicket(w http.ResponseWriter, r *http.Request) {
 	ticket := Ticket{}
 
-	ticket.Title = r.FormValue("title")
-	ticket.Desc = r.FormValue("desc")
+	title := r.FormValue("title")
+	if title == "" {
+		http.Error(w, "Title is required", http.StatusBadRequest)
+		return
+	}
+	ticket.Title = title
+
+	desc := r.FormValue("desc")
+	if desc == "" {
+		http.Error(w, "Description is required", http.StatusBadRequest)
+		return
+	}
+	ticket.Desc = desc
 
 	ticket.CreatedAt = time.Now()
 
@@ -59,5 +70,4 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 	shared.Check(err, "Error inserting ticket")
 
 	err = tmpl.ExecuteTemplate(w, "layout", nil)
-	fmt.Println("Ticket added successfully\n", ticket)
 }
