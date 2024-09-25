@@ -15,9 +15,13 @@
 
 <body>
     <main>
-        {{template "addTicket" .}}
-        <div hx-get="/api/v1/tickets" hx-trigger="load" hx-target="this" hx-swap="innerHTML">
-            {{template "getTickets" .}}
+        <div class="grid grid-cols-2 gap-4 mt-6 mx-6">
+            <div class="flex flex-col" hx-get="/api/v1/tickets" hx-trigger="load" hx-target="this" hx-swap="innerHTML">
+                {{template "getTickets" .}}
+            </div>
+            <div>
+                {{template "addTicket" .}}
+            </div>
         </div>
     </main>
 </body>
