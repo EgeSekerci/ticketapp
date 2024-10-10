@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"database/sql"
 	"net/http"
 	"time"
 
@@ -13,9 +14,13 @@ type Ticket struct {
 	Title     string
 	Desc      string
 	CreatedAt time.Time
+	SolvedAt  time.Time
+	IsSolved  bool
 }
 type TemplateData struct {
-	Tickets []Ticket
+	Tickets   []Ticket
+	CreatedAt []string
+	SolvedAt  []string
 }
 
 func GetTickets(w http.ResponseWriter, r *http.Request) {
@@ -28,22 +33,43 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var tickets []Ticket
+	var createdAtString, solvedAtString []string
 
 	for rows.Next() {
 		var ticket Ticket
 
+		var solvedAt sql.NullTime
+		var createdAt sql.NullTime
+
 		err := rows.Scan(
 			&ticket.Title,
 			&ticket.Desc,
-			&ticket.CreatedAt,
+			&createdAt,
+			&solvedAt,
+			&ticket.IsSolved,
+			&ticket.Id,
 		)
 		shared.Check(err, "Error scanning ticket data")
+
+		if createdAt.Valid {
+			createdAtString = append(createdAtString, createdAt.Time.Format("02.01.2006 15:04"))
+		} else {
+			createdAtString = append(createdAtString, "")
+		}
+		if solvedAt.Valid {
+			solvedAtString = append(solvedAtString, solvedAt.Time.Format("02.01.2006 15:04"))
+		} else {
+			solvedAtString = append(solvedAtString, "")
+		}
+
 		tickets = append(tickets, ticket)
 	}
 	shared.Check(rows.Err(), "Error on rows.Next()")
 
 	templateData := TemplateData{
-		Tickets: tickets,
+		Tickets:   tickets,
+		CreatedAt: createdAtString,
+		SolvedAt:  solvedAtString,
 	}
 	err = tmpl.ExecuteTemplate(w, "getTickets", templateData)
 	shared.Check(err, "Error executing template")
@@ -77,4 +103,23 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 	shared.Check(err, "Error inserting ticket")
 
 	err = tmpl.ExecuteTemplate(w, "layout", nil)
+}
+
+func SolveTicket(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	db := db.Connect()
+	defer db.Close()
+
+	time := time.Now()
+
+	update := `UPDATE tickets SET is_solved = true, solved_at = $1 WHERE id = $2`
+
+	_, err := db.Exec(update, time, id)
+
+	shared.Check(err, "Error updating ticket")
+
+	err = tmpl.ExecuteTemplate(w, "getTickets", nil)
+
+	shared.Check(err, "Error executing template")
 }
