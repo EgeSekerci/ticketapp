@@ -25,3 +25,7 @@ func TicketRoutes(mux *http.ServeMux) {
 	mux.Handle("POST /api/v1/addTicket", http.HandlerFunc(tasks.AddTicket))
 	mux.Handle("PATCH /api/v1/solveTicket/{id}", http.HandlerFunc(tasks.SolveTicket))
 }
+
+func AuthRoutes(mux *http.ServeMux) {
+	mux.Handle("POST /api/v1/signup", http.HandlerFunc(tasks.Signup))
+}

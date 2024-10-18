@@ -26,6 +26,7 @@ func main() {
 	routes.PageRoutes(mux)
 	routes.ServeRoutes(mux, content)
 	routes.TicketRoutes(mux)
+	routes.AuthRoutes(mux)
 
 	port := ":8080"
 	fmt.Printf("Listening on %s \n", port)
