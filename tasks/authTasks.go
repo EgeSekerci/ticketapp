@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/alexedwards/argon2id"
 
@@ -43,4 +44,43 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	_, err := db.Exec(insert, user.Email, user.Password, user.Role, user.Name)
 	shared.Check(err, "Error inserting user")
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	user := User{}
+
+	email := strings.ToLower(r.FormValue("email"))
+	password := r.FormValue("password")
+
+	if email == "" || password == "" {
+		http.Error(w, "Email and password are required", http.StatusBadRequest)
+	}
+
+	db := db.Connect()
+	defer db.Close()
+
+	row := db.QueryRow("SELECT email, password FROM users WHERE email = $1", email)
+
+	err := row.Scan(
+		&user.Email,
+		&user.Password,
+	)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	match, err := argon2id.ComparePasswordAndHash(password, user.Password)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	if match {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	return
 }
