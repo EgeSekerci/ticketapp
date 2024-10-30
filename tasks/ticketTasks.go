@@ -27,7 +27,6 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 	db := db.Connect()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT * FROM tickets")
 	rows, err := db.Query("SELECT * FROM tickets WHERE is_solved = false")
 	shared.Check(err, "Error receiving tickets")
 
