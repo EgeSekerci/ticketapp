@@ -9,6 +9,7 @@ import (
 
 func PageRoutes(mux *http.ServeMux) {
 	mux.Handle("GET /", http.HandlerFunc(tasks.RenderHome))
+	mux.Handle("GET /signup", http.HandlerFunc(tasks.RenderSignup))
 }
 
 func ServeRoutes(mux *http.ServeMux, content embed.FS) {
