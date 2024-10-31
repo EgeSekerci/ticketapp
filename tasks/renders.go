@@ -59,3 +59,10 @@ func RenderSignup(w http.ResponseWriter, r *http.Request) {
 	err := tmpl.ExecuteTemplate(w, "signupLayout", nil)
 	shared.Check(err, "Error executing template")
 }
+
+func RenderLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+
+	err := tmpl.ExecuteTemplate(w, "loginLayout", nil)
+	shared.Check(err, "Error executing template")
+}
