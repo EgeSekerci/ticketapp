@@ -23,9 +23,12 @@ func ServeRoutes(mux *http.ServeMux, content embed.FS) {
 }
 
 func TicketRoutes(mux *http.ServeMux) {
-	mux.Handle("GET /api/v1/tickets", http.HandlerFunc(tasks.GetTickets))
-	mux.Handle("POST /api/v1/addTicket", http.HandlerFunc(tasks.AddTicket))
-	mux.Handle("PATCH /api/v1/solveTicket/{id}", http.HandlerFunc(tasks.SolveTicket))
+	mux.Handle("GET /api/v1/tickets", tasks.WithJWTAuth(http.HandlerFunc(tasks.GetTickets)))
+	mux.Handle("POST /api/v1/addTicket", tasks.WithJWTAuth(http.HandlerFunc(tasks.AddTicket)))
+	mux.Handle(
+		"PATCH /api/v1/solveTicket/{id}",
+		tasks.WithJWTAuth(http.HandlerFunc(tasks.SolveTicket)),
+	)
 }
 
 func AuthRoutes(mux *http.ServeMux) {
