@@ -77,6 +77,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if match {
+		tokenString, err := createJWT(&user)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
+
+		cookie := http.Cookie{
+			Name:     "Authorization",
+			Value:    tokenString,
+			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteLaxMode,
+			Path:     "/",
+		}
+
+		http.SetCookie(w, &cookie)
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
