@@ -34,4 +34,5 @@ func TicketRoutes(mux *http.ServeMux) {
 func AuthRoutes(mux *http.ServeMux) {
 	mux.Handle("POST /api/v1/signup", http.HandlerFunc(tasks.Signup))
 	mux.Handle("POST /api/v1/login", http.HandlerFunc(tasks.Login))
+	mux.Handle("POST /api/v1/logout", http.HandlerFunc(tasks.Logout))
 }

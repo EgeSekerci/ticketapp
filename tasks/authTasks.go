@@ -99,3 +99,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 	return
 }
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "Authorization",
+		Value:    "",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+		MaxAge:   -1,
+	}
+
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/login", http.StatusFound)
+}
