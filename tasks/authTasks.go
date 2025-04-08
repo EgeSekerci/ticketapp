@@ -59,9 +59,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	db := db.Connect()
 	defer db.Close()
 
-	row := db.QueryRow("SELECT email, password FROM users WHERE email = $1", email)
+	emailRow := db.QueryRow("SELECT email, password FROM users WHERE email = $1", email)
 
-	err := row.Scan(
+	err := emailRow.Scan(
 		&user.Email,
 		&user.Password,
 	)
@@ -77,6 +77,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if match {
+		idRow := db.QueryRow("SELECT id, role FROM users WHERE email = $1", email)
+
+		err := idRow.Scan(
+			&user.Id,
+			&user.Role,
+		)
+
 		tokenString, err := createJWT(&user)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
