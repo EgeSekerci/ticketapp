@@ -11,21 +11,6 @@ import (
 	"ticketapp/shared"
 )
 
-type Ticket struct {
-	Id        int
-	Title     string
-	Desc      string
-	CreatedAt time.Time
-	SolvedAt  time.Time
-	IsSolved  bool
-	CreatedBy float64
-}
-type TemplateData struct {
-	Tickets   []Ticket
-	CreatedAt []string
-	SolvedAt  []string
-}
-
 func GetTickets(w http.ResponseWriter, r *http.Request) {
 	db := db.Connect()
 	defer db.Close()

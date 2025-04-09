@@ -14,20 +14,6 @@ import (
 	"ticketapp/shared"
 )
 
-type User struct {
-	Id       int
-	Email    string
-	Password string
-	Role     string
-	Name     string
-}
-
-type contextKey string
-
-const (
-	claimsContextKey contextKey = "claims"
-)
-
 func createJWT(user *User) (string, error) {
 	err := godotenv.Load()
 	shared.Check(err, "Error loading .env")
