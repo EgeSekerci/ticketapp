@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"ticketapp/db"
 	"ticketapp/shared"
 )
@@ -16,6 +18,7 @@ type Ticket struct {
 	CreatedAt time.Time
 	SolvedAt  time.Time
 	IsSolved  bool
+	UserId    float64
 }
 type TemplateData struct {
 	Tickets   []Ticket
@@ -48,6 +51,7 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 			&solvedAt,
 			&ticket.IsSolved,
 			&ticket.Id,
+			&ticket.UserId,
 		)
 		shared.Check(err, "Error scanning ticket data")
 
@@ -78,6 +82,17 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 func AddTicket(w http.ResponseWriter, r *http.Request) {
 	ticket := Ticket{}
 
+	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
+	if claims != nil {
+		if userId, ok := claims["userId"]; ok {
+			ticket.UserId = userId.(float64)
+		} else {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		}
+	} else {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	}
+
 	title := r.FormValue("title")
 	if title == "" {
 		http.Error(w, "Title is required", http.StatusBadRequest)
@@ -94,15 +109,15 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 
 	ticket.CreatedAt = time.Now()
 
-	insert := `INSERT INTO "tickets" ("title", "desc", "created_at") VALUES ($1, $2, $3)`
+	insert := `INSERT INTO "tickets" ("title", "desc", "created_at", "userid") VALUES ($1, $2, $3, $4)`
 
 	db := db.Connect()
 	defer db.Close()
 
-	_, err := db.Exec(insert, ticket.Title, ticket.Desc, ticket.CreatedAt)
+	_, err := db.Exec(insert, ticket.Title, ticket.Desc, ticket.CreatedAt, ticket.UserId)
 	shared.Check(err, "Error inserting ticket")
 
-	err = tmpl.ExecuteTemplate(w, "layout", nil)
+	RenderHome(w, r)
 }
 
 func SolveTicket(w http.ResponseWriter, r *http.Request) {
