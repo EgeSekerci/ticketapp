@@ -18,7 +18,7 @@ type Ticket struct {
 	CreatedAt time.Time
 	SolvedAt  time.Time
 	IsSolved  bool
-	UserId    float64
+	CreatedBy float64
 }
 type TemplateData struct {
 	Tickets   []Ticket
@@ -51,7 +51,7 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 			&solvedAt,
 			&ticket.IsSolved,
 			&ticket.Id,
-			&ticket.UserId,
+			&ticket.CreatedBy,
 		)
 		shared.Check(err, "Error scanning ticket data")
 
@@ -85,7 +85,7 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
 	if claims != nil {
 		if userId, ok := claims["userId"]; ok {
-			ticket.UserId = userId.(float64)
+			ticket.CreatedBy = userId.(float64)
 		} else {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		}
@@ -109,12 +109,12 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 
 	ticket.CreatedAt = time.Now()
 
-	insert := `INSERT INTO "tickets" ("title", "desc", "created_at", "userid") VALUES ($1, $2, $3, $4)`
+	insert := `INSERT INTO "tickets" ("title", "desc", "created_at", "created_by") VALUES ($1, $2, $3, $4)`
 
 	db := db.Connect()
 	defer db.Close()
 
-	_, err := db.Exec(insert, ticket.Title, ticket.Desc, ticket.CreatedAt, ticket.UserId)
+	_, err := db.Exec(insert, ticket.Title, ticket.Desc, ticket.CreatedAt, ticket.CreatedBy)
 	shared.Check(err, "Error inserting ticket")
 
 	RenderHome(w, r)
