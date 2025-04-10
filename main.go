@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
 	"embed"
-	"fmt"
+	"errors"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"ticketapp/routes"
 	"ticketapp/shared"
@@ -21,16 +27,33 @@ func init() {
 }
 
 func main() {
+	log.Println("Starting...")
 	mux := http.NewServeMux()
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
 
 	routes.PageRoutes(mux)
 	routes.ServeRoutes(mux, content)
 	routes.TicketRoutes(mux)
 	routes.AuthRoutes(mux)
 
-	port := ":8080"
-	fmt.Printf("Listening on %s \n", port)
+	go func() {
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+	}()
 
-	err := http.ListenAndServe(port, mux)
-	shared.Check(err, "Error starting the server")
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownRelease()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("HTTP shutdown error: %v", err)
+	}
 }
