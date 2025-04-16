@@ -85,21 +85,21 @@ func AddTicket(w http.ResponseWriter, r *http.Request) {
 	}
 	ticket.Title = title
 
-	desc := r.FormValue("desc")
-	if desc == "" {
+	description := r.FormValue("description")
+	if description == "" {
 		http.Error(w, "Description is required", http.StatusBadRequest)
 		return
 	}
-	ticket.Desc = desc
+	ticket.Description = description
 
 	ticket.CreatedAt = time.Now()
 
-	insert := `INSERT INTO "tickets" ("title", "desc", "created_at", "created_by") VALUES ($1, $2, $3, $4)`
+	insert := `INSERT INTO tickets (title, description, created_at, created_by) VALUES ($1, $2, $3, $4)`
 
 	db := db.Connect()
 	defer db.Close()
 
-	_, err := db.Exec(insert, ticket.Title, ticket.Desc, ticket.CreatedAt, ticket.CreatedBy)
+	_, err := db.Exec(insert, ticket.Title, ticket.Description, ticket.CreatedAt, ticket.CreatedBy)
 	shared.Check(err, "Error inserting ticket")
 
 	RenderHome(w, r)
