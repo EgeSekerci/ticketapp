@@ -12,43 +12,64 @@ import (
 )
 
 func GetTickets(w http.ResponseWriter, r *http.Request) {
+	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
+	if claims == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	}
+	userId, ok := claims["userId"]
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	}
+
+	role, ok := claims["userRole"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	}
+
+	var tempData TemplateData
+	if ok {
+		if role == "user" {
+			query := "SELECT title, description, created_at FROM tickets WHERE is_solved = false AND created_by = $1"
+			tempData = GetTicket(query, userId)
+		} else if role == "admin" {
+			query := "SELECT title, description, created_at, created_by FROM tickets WHERE is_solved = false"
+			tempData = GetAllTickets(query)
+			//#TODO get user names by user id and display as user name
+		}
+	}
+	err := tmpl.ExecuteTemplate(w, "getTickets", tempData)
+	shared.Check(err, "Error executing template")
+}
+
+func GetTicket(query string, userId interface{}) TemplateData {
 	db := db.Connect()
 	defer db.Close()
-
-	rows, err := db.Query("SELECT * FROM tickets WHERE is_solved = false")
+	rows, err := db.Query(query, userId)
 	shared.Check(err, "Error receiving tickets")
-
 	defer rows.Close()
 
 	var tickets []Ticket
-	var createdAtString, solvedAtString []string
+	var createdAtString []string
 
 	for rows.Next() {
 		var ticket Ticket
 
-		var solvedAt sql.NullTime
 		var createdAt sql.NullTime
 
 		err := rows.Scan(
 			&ticket.Title,
-			&ticket.Desc,
+			&ticket.Description,
 			&createdAt,
-			&solvedAt,
-			&ticket.IsSolved,
-			&ticket.Id,
-			&ticket.CreatedBy,
 		)
 		shared.Check(err, "Error scanning ticket data")
 
 		if createdAt.Valid {
-			createdAtString = append(createdAtString, createdAt.Time.Format("02.01.2006 15:04"))
+			createdAtString = append(
+				createdAtString,
+				createdAt.Time.Format("02.01.2006 15:04"),
+			)
 		} else {
 			createdAtString = append(createdAtString, "")
-		}
-		if solvedAt.Valid {
-			solvedAtString = append(solvedAtString, solvedAt.Time.Format("02.01.2006 15:04"))
-		} else {
-			solvedAtString = append(solvedAtString, "")
 		}
 
 		tickets = append(tickets, ticket)
@@ -58,10 +79,67 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 	templateData := TemplateData{
 		Tickets:   tickets,
 		CreatedAt: createdAtString,
-		SolvedAt:  solvedAtString,
 	}
-	err = tmpl.ExecuteTemplate(w, "getTickets", templateData)
-	shared.Check(err, "Error executing template")
+	return templateData
+}
+
+func GetAllTickets(query string) TemplateData {
+	db := db.Connect()
+	defer db.Close()
+	rows, err := db.Query(query)
+	shared.Check(err, "Error receiving tickets")
+	defer rows.Close()
+
+	var tickets []Ticket
+	var createdAtString []string
+
+	for rows.Next() {
+		var ticket Ticket
+
+		var createdAt sql.NullTime
+
+		err := rows.Scan(
+			&ticket.Title,
+			&ticket.Description,
+			&createdAt,
+			&ticket.CreatedBy,
+		)
+		shared.Check(err, "Error scanning ticket data")
+
+		if createdAt.Valid {
+			createdAtString = append(
+				createdAtString,
+				createdAt.Time.Format("02.01.2006 15:04"),
+			)
+		} else {
+			createdAtString = append(createdAtString, "")
+		}
+
+		tickets = append(tickets, ticket)
+	}
+	shared.Check(rows.Err(), "Error on rows.Next()")
+
+	templateData := TemplateData{
+		Tickets:   tickets,
+		CreatedAt: createdAtString,
+	}
+	return templateData
+}
+
+func getUserName(userId float64) User {
+	user := User{}
+	db := db.Connect()
+	defer db.Close()
+
+	row := db.QueryRow("SELECT name FROM users WHERE id = $1", userId)
+
+	err := row.Scan(
+		&user.Name,
+	)
+	if err != nil {
+		shared.Check(err, "Unauthorized")
+	}
+	return user
 }
 
 func AddTicket(w http.ResponseWriter, r *http.Request) {
