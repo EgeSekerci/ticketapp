@@ -51,17 +51,19 @@ func ParseAllFiles(content embed.FS) error {
 func RenderHome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
-	if claims != nil {
-		if page, ok := claims["userRole"].(string); ok {
-			switch page {
-			case "admin":
-				page = "adminhome"
-			default:
-				page = "userhome"
-			}
-			err := tmpl.ExecuteTemplate(w, page, nil)
-			shared.Check(err, "Error executing template")
+	if claims == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if page, ok := claims["userRole"].(string); ok {
+		switch page {
+		case "admin":
+			page = "adminhome"
+		default:
+			page = "userhome"
 		}
+		err := tmpl.ExecuteTemplate(w, page, nil)
+		shared.Check(err, "Error executing template")
 	}
 }
 
