@@ -6,6 +6,9 @@
             <h3 class="font-black text-gray-800 md:text-3xl text-xl">{{$ticket.Title}}</h3>
             <p class="md:text-lg text-gray-500 text-base">{{$ticket.Description}}</p>
             <p class="md:text-lg text-gray-500 text-base">{{index $.CreatedAt $index}}</p>
+            {{if $ticket.CreatedBy}}
+            <p class="md:text-lg text-gray-500 text-base">{{$ticket.CreatedBy}}</p>
+            {{end}}
         </div>
         <div>
             <button class="md:text-lg text-gray-500 text-base" hx-patch="/api/v1/solveTicket/{{.Id}}"
