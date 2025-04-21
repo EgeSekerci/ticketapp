@@ -58,6 +58,7 @@ func GetAllTickets(query string) TemplateData {
 
 	var tickets []Ticket
 	var createdAtString []string
+	var userName []string
 
 	for rows.Next() {
 		var ticket Ticket
@@ -80,6 +81,7 @@ func GetAllTickets(query string) TemplateData {
 		} else {
 			createdAtString = append(createdAtString, "")
 		}
+		userName = append(userName, getUserName(ticket.CreatedBy))
 
 		tickets = append(tickets, ticket)
 	}
@@ -88,11 +90,12 @@ func GetAllTickets(query string) TemplateData {
 	templateData := TemplateData{
 		Tickets:   tickets,
 		CreatedAt: createdAtString,
+		UserName:  userName,
 	}
 	return templateData
 }
 
-func getUserName(userId float64) User {
+func getUserName(userId float64) string {
 	user := User{}
 	db := db.Connect()
 	defer db.Close()
@@ -105,5 +108,5 @@ func getUserName(userId float64) User {
 	if err != nil {
 		shared.Check(err, "Unauthorized")
 	}
-	return user
+	return user.Name
 }

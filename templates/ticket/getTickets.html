@@ -7,7 +7,7 @@
             <p class="md:text-lg text-gray-500 text-base">{{$ticket.Description}}</p>
             <p class="md:text-lg text-gray-500 text-base">{{index $.CreatedAt $index}}</p>
             {{if $ticket.CreatedBy}}
-            <p class="md:text-lg text-gray-500 text-base">{{$ticket.CreatedBy}}</p>
+            <p class="md:text-lg text-gray-500 text-base">{{index $.UserName $index}}</p>
             {{end}}
         </div>
         <div>

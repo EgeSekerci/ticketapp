@@ -17,6 +17,7 @@ type TemplateData struct {
 	Tickets   []Ticket
 	CreatedAt []string
 	SolvedAt  []string
+	UserName  []string
 }
 
 type User struct {
