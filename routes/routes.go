@@ -29,13 +29,6 @@ func TicketRoutes(mux *http.ServeMux) {
 		"PATCH /api/v1/solveTicket/{id}",
 		tasks.WithJWTAuth(http.HandlerFunc(tasks.SolveTicket)),
 	)
-	//#TODO Create a function for role based ticket display
-	// mux.Handle(
-	//
-	//	"GET /api/v1/tickets/{userId}",
-	//	tasks.WithJWTAuth(http.HandlerFunc(tasks.GetTickets)),
-	//
-	// )
 }
 
 func AuthRoutes(mux *http.ServeMux) {
