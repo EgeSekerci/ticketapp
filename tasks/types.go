@@ -18,6 +18,7 @@ type TemplateData struct {
 	CreatedAt []string
 	SolvedAt  []string
 	UserName  []string
+	IsAdmin   bool
 }
 
 type User struct {

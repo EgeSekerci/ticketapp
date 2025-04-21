@@ -10,10 +10,12 @@
             <p class="md:text-lg text-gray-500 text-base">{{index $.UserName $index}}</p>
             {{end}}
         </div>
+        {{if $.IsAdmin}}
         <div>
             <button class="md:text-lg text-gray-500 text-base" hx-patch="/api/v1/solveTicket/{{.Id}}"
                 hx-target="closest #card" hx-swap="outerHTML">Mark as solved</button>
         </div>
+        {{end}}
     </div>
     {{end}}
 </div>

@@ -30,10 +30,12 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 		if role == "user" {
 			query := "SELECT title, description, created_at FROM tickets WHERE is_solved = false AND created_by = $1"
 			tempData = GetTicket(query, userId)
-		} else if role == "admin" {
+		}
+		if role == "admin" {
 			query := "SELECT title, description, created_at, created_by FROM tickets WHERE is_solved = false"
 			tempData = GetAllTickets(query)
-			//#TODO get user names by user id and display as user name
+
+			tempData.IsAdmin = true
 		}
 	}
 	err := tmpl.ExecuteTemplate(w, "getTickets", tempData)
