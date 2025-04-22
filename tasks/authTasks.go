@@ -37,7 +37,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	user.Role = role
 	user.Name = name
 
-	insert := `INSERT INTO "users" ("email", "password", "role", "name") VALUES ($1, $2, $3, $4)`
+	insert := `INSERT INTO users (email, password, role, name) VALUES ($1, $2, $3, $4)`
 
 	db := db.Connect()
 	defer db.Close()
@@ -77,11 +77,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if match {
-		idRow := db.QueryRow("SELECT id, role FROM users WHERE email = $1", email)
+		userRow := db.QueryRow("SELECT id, role, name FROM users WHERE email = $1", email)
 
-		err := idRow.Scan(
+		err := userRow.Scan(
 			&user.Id,
 			&user.Role,
+			&user.Name,
 		)
 
 		tokenString, err := createJWT(&user)
