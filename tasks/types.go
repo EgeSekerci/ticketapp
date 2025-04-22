@@ -14,6 +14,7 @@ type Ticket struct {
 	CreatedBy   float64
 }
 type TemplateData struct {
+	UserInfo  User
 	Tickets   []Ticket
 	CreatedAt []string
 	SolvedAt  []string

@@ -52,19 +52,44 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
 	if claims == nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	userId, ok := claims["userId"].(float64)
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	if page, ok := claims["userRole"].(string); ok {
-		switch page {
-		case "admin":
-			page = "adminhome"
-		default:
-			page = "userhome"
-		}
-		err := tmpl.ExecuteTemplate(w, page, nil)
-		shared.Check(err, "Error executing template")
+
+	userRole, ok := claims["userRole"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
 	}
+
+	userName, ok := claims["userName"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	userData := User{
+		Id:   int(userId),
+		Role: userRole,
+		Name: userName,
+	}
+	tempData := TemplateData{
+		UserInfo: userData,
+	}
+	var page string
+	switch userRole {
+	case "admin":
+		page = "adminhome"
+	default:
+		page = "userhome"
+	}
+	err := tmpl.ExecuteTemplate(w, page, tempData)
+	shared.Check(err, "Error executing template")
 }
 
 func RenderSignup(w http.ResponseWriter, r *http.Request) {
