@@ -13,6 +13,7 @@ type Ticket struct {
 	IsSolved    bool
 	CreatedBy   float64
 }
+
 type TemplateData struct {
 	UserInfo  User
 	Tickets   []Ticket
@@ -21,6 +22,8 @@ type TemplateData struct {
 	UserName  []string
 	IsAdmin   bool
 }
+
+var TempData TemplateData
 
 type User struct {
 	Id       int
@@ -32,6 +35,4 @@ type User struct {
 
 type contextKey string
 
-const (
-	claimsContextKey contextKey = "claims"
-)
+const claimsContextKey contextKey = "claims"

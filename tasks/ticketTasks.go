@@ -25,20 +25,20 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 	}
 
-	var tempData TemplateData
 	if ok {
 		if role == "user" {
 			query := "SELECT title, description, created_at FROM tickets WHERE is_solved = false AND created_by = $1"
-			tempData = GetTicket(query, userId)
+			TempData = GetTicket(query, userId)
 		}
 		if role == "admin" {
 			query := "SELECT title, description, created_at, created_by FROM tickets WHERE is_solved = false"
-			tempData = GetAllTickets(query)
+			TempData = GetAllTickets(query)
 
-			tempData.IsAdmin = true
+			TempData.IsAdmin = true
 		}
 	}
-	err := tmpl.ExecuteTemplate(w, "getTickets", tempData)
+
+	err := tmpl.ExecuteTemplate(w, "getTickets", TempData)
 	shared.Check(err, "Error executing template")
 }
 

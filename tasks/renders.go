@@ -78,9 +78,10 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 		Role: userRole,
 		Name: userName,
 	}
-	tempData := TemplateData{
-		UserInfo: userData,
-	}
+
+	TempData.UserInfo = userData
+	TempData.IsAdmin = userRole == "admin"
+
 	var page string
 	switch userRole {
 	case "admin":
@@ -88,7 +89,7 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 	default:
 		page = "userhome"
 	}
-	err := tmpl.ExecuteTemplate(w, page, tempData)
+	err := tmpl.ExecuteTemplate(w, page, TempData)
 	shared.Check(err, "Error executing template")
 }
 

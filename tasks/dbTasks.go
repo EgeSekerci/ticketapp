@@ -42,11 +42,10 @@ func GetTicket(query string, userId interface{}) TemplateData {
 	}
 	shared.Check(rows.Err(), "Error on rows.Next()")
 
-	templateData := TemplateData{
-		Tickets:   tickets,
-		CreatedAt: createdAtString,
-	}
-	return templateData
+	TempData.Tickets = tickets
+	TempData.CreatedAt = createdAtString
+
+	return TempData
 }
 
 func GetAllTickets(query string) TemplateData {
@@ -87,12 +86,11 @@ func GetAllTickets(query string) TemplateData {
 	}
 	shared.Check(rows.Err(), "Error on rows.Next()")
 
-	templateData := TemplateData{
-		Tickets:   tickets,
-		CreatedAt: createdAtString,
-		UserName:  userName,
-	}
-	return templateData
+	TempData.Tickets = tickets
+	TempData.CreatedAt = createdAtString
+	TempData.UserName = userName
+
+	return TempData
 }
 
 func getUserName(userId float64) string {
