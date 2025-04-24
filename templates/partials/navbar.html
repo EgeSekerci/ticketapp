@@ -4,12 +4,15 @@
     <div class="flex items-center gap-2">
         <ul class="flex items-center space-x-6">
             <li class="font-semibold text-gray-700 text-xl"><a href="/">Home</a></li>
-        </ul>
-        <ul>
-            <button hx-post="/api/v1/logout" hx-swap="outerHTML" hx-target="body" hx-push-url="true" type="submit"
-                class="font-semibold text-red-700 text-xl">
-                Logout
-            </button>
+            {{if $.IsAdmin}}
+            <li><a href="/signup">New User</a></li>
+            {{end}}
+            <li>
+                <button hx-post="/api/v1/logout" hx-swap="outerHTML" hx-target="body" hx-push-url="true" type="submit"
+                    class="font-semibold text-red-700 text-xl">
+                    Logout
+                </button>
+            </li>
         </ul>
     </div>
 </div>

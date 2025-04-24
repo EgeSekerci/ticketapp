@@ -9,7 +9,7 @@ import (
 
 func PageRoutes(mux *http.ServeMux) {
 	mux.Handle("GET /", tasks.WithJWTAuth(http.HandlerFunc(tasks.RenderHome)))
-	mux.Handle("GET /signup", http.HandlerFunc(tasks.RenderSignup))
+	mux.Handle("GET /signup", tasks.WithJWTAuth(http.HandlerFunc(tasks.RenderSignup)))
 	mux.Handle("GET /login", http.HandlerFunc(tasks.RenderLogin))
 }
 

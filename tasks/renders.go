@@ -93,16 +93,39 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 	shared.Check(err, "Error executing template")
 }
 
-func RenderSignup(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-
-	err := tmpl.ExecuteTemplate(w, "signupLayout", nil)
-	shared.Check(err, "Error executing template")
-}
-
 func RenderLogin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
 	err := tmpl.ExecuteTemplate(w, "loginLayout", nil)
+	shared.Check(err, "Error executing template")
+}
+
+func RenderSignup(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+
+	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
+	if claims == nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	_, ok := claims["userId"].(float64)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	userRole, ok := claims["userRole"].(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	if userRole != "admin" {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	err := tmpl.ExecuteTemplate(w, "signupLayout", nil)
 	shared.Check(err, "Error executing template")
 }
