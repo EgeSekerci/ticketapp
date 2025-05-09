@@ -19,10 +19,10 @@ func createJWT(user *User) (string, error) {
 	shared.Check(err, "Error loading .env")
 
 	claims := &jwt.MapClaims{
-		"exp":      time.Now().Add(time.Minute * 15).Unix(),
-		"userId":   user.Id,
-		"userRole": user.Role,
-		"userName": user.Name,
+		"expiresAt": time.Now().Add(time.Minute * 15).Unix(),
+		"userId":    user.Id,
+		"userRole":  user.Role,
+		"userName":  user.Name,
 	}
 
 	secret := os.Getenv("JWT_KEY")
