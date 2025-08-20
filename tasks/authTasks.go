@@ -10,8 +10,6 @@ import (
 	"ticketapp/shared"
 )
 
-var hashedPassword string
-
 func createHash(passwordToHash string) string {
 	hash, err := argon2id.CreateHash(passwordToHash, argon2id.DefaultParams)
 	shared.Check(err, "Error while hashing password")
@@ -44,6 +42,9 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	_, err := db.Exec(insert, user.Email, user.Password, user.Role, user.Name)
 	shared.Check(err, "Error inserting user")
+
+	http.Redirect(w, r, "/", http.StatusFound)
+	return
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {

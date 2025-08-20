@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"path/filepath"
 
 	"github.com/golang-jwt/jwt/v5"
 
@@ -25,17 +24,6 @@ func ServeStaticFiles(w http.ResponseWriter, r *http.Request, content embed.FS) 
 	}).ServeHTTP(w, r)
 }
 
-func getTemplateFiles(patterns ...string) []string {
-	var files []string
-	for _, pattern := range patterns {
-		matches, err := filepath.Glob(pattern)
-		shared.Check(err, "Failed to get templates")
-
-		files = append(files, matches...)
-	}
-	return files
-}
-
 var tmpl *template.Template
 
 func ParseAllFiles(content embed.FS) error {
@@ -52,7 +40,7 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	claims := r.Context().Value(claimsContextKey).(jwt.MapClaims)
 	if claims == nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusFound) // Fix superfluous error
 		return
 	}
 
@@ -78,7 +66,6 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 		Role: userRole,
 		Name: userName,
 	}
-
 	TempData.UserInfo = userData
 	TempData.IsAdmin = userRole == "admin"
 
