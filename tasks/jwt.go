@@ -9,14 +9,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
-
-	"ticketapp/shared"
 )
 
 func createJWT(user *User) (string, error) {
-	err := godotenv.Load()
-	shared.Check(err, "Error loading .env")
+	// 	err := godotenv.Load()
+	// 	shared.Check(err, "Error loading .env")
 
 	claims := &jwt.MapClaims{
 		"expiresAt": time.Now().Add(time.Minute * 15).Unix(),
@@ -49,8 +46,8 @@ func WithJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
 }
 
 func validateJWT(tokenString string) (jwt.MapClaims, error) {
-	err := godotenv.Load()
-	shared.Check(err, "Error loading .env")
+	// 	err := godotenv.Load()
+	// 	shared.Check(err, "Error loading .env")
 
 	secret := os.Getenv("JWT_KEY")
 

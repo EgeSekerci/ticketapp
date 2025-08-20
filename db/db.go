@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
 	"ticketapp/shared"
@@ -30,8 +29,8 @@ func loadDbConfig() dbConfig {
 }
 
 func Connect() *sql.DB {
-	err := godotenv.Load()
-	shared.Check(err, "Error loading .env")
+	// 	err := godotenv.Load()
+	// 	shared.Check(err, "Error loading .env")
 
 	configs := loadDbConfig()
 
